@@ -1,12 +1,15 @@
 # ERP OFFLINE (CBIT) [Unofficial]
 
 Folder Structure:
+
+```
 /credentials.json
 /homepage.html
 .
 .
 .
 Rest of the scripts
+```
 
 ---
 

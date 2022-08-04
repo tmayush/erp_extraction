@@ -36,7 +36,8 @@ def set_headers(headers):
     headers["Accept-Encoding"] = "gzip, deflate, br"
     headers["Content-Type"] = "application/x-www-form-urlencoded"
     # /The only two headers that matter
-    headers["Origin"] = "https://erp.org.in"
+    headers["Origin"] = "https://erp.cbit.org.in"
+    headers["Host"] = "erp.cbit.org.in"
     headers["DNT"] = "1"
     headers["Connection"] = "keep-alive"
     headers["Upgrade-Insecure-Requests"] = "1"
