@@ -1,6 +1,9 @@
-import requests, csv, os, json
-from bs4 import BeautifulSoup
+import requests, os, json
 import util_helper
+import utils.attendance_extraction as attendance
+import utils.json_csv_util as jcv
+from utils import time_util
+
 
 GLOBAL = {}
 
@@ -89,37 +92,21 @@ def visit(session_obj: requests.Session, erp_url: str, homepage_filepath: str) -
     print("Successfully Generated Homepage")
 
 
-def createcsv(csv_filepath: str, homepage_filepath: str) -> None:
-    print(f"Extracting data from {homepage_filepath}")
-
-    soup = None
-    # Stores the main table that wraps the attendance content
-    main_table = None
-
-    with open(homepage_filepath, "r") as file:
-        soup = BeautifulSoup(file, features="html.parser")
-
-    # get all tables and filter with the specific ID to get the attendance table
-    all_tables = soup.find_all("table")
-    for table in all_tables:
-        if table.get("id") == "ctl00_cpStud_grdSubject":
-            main_table = table
-
-    with open(csv_filepath, "w", encoding="UTF8", newline="") as f:
-        writer = csv.writer(f)
-        for tr in main_table.find_all("tr"):
-            row_data = []
-            for th in tr.children:
-                # stripping because some text may have new lines at the end
-                element_text = th.text.strip()
-                row_data.append(element_text)
-
-            # The following locations contain empty strings
-            row_data.pop(0)
-            row_data.pop(-1)
-
-            writer.writerow(row_data)
-
+def createcsv(csv_filepath: str, homepage_fp: str) -> None:
+    print(f"Extracting data from {homepage_fp}")
+    main_table = attendance.get_element_by_id(
+        homepage_fp, "table", "ctl00_cpStud_grdSubject"
+    )
+    all_rows = attendance.get_summary_list(main_table)
+    json_file = "data.json"
+    jcv.create_db(json_file)
+    my_dict = {
+        "type": "Updated",
+        "date": time_util.get_formatted_date(),
+        "data": all_rows,
+    }
+    jcv.update_db(my_dict, json_file, json_file)
+    jcv.generate_csv(json_file, csv_filepath)
     print(f"Generated a CSV file - {csv_filepath}")
 
 
