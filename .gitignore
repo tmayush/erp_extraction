@@ -1,6 +1,9 @@
-credentials*.json
 __pycache__
 *.html
 *.csv
-*.json
+*credentials*.json
+*data*.json
 .prettierignore
+attendance data
+internal_data
+file_locations.json

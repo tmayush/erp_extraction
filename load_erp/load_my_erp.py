@@ -1,9 +1,8 @@
 import requests, os, json
-import util_helper
-import utils.attendance_extraction as attendance
-import utils.json_csv_util as jcv
-from utils import time_util
-
+from erp_utils import util_helper
+from erp_utils import attendance_extraction as attendance
+from erp_utils import json_csv_util as jcv
+from erp_utils import time_util
 
 GLOBAL = {}
 
