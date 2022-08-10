@@ -16,7 +16,6 @@ def main():
         return
     GLOBAL_["config_data"] = setup.get_configs_data(config_fp)
     if GLOBAL_["config_data"]["first_run"]:
-        print("yes")
         GLOBAL_["config_data"]["first_run"] = False
         setup.update_configs_data(GLOBAL_["config_data"], config_fp)
         setup.main(configs_F)

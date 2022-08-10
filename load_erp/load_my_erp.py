@@ -108,7 +108,6 @@ def createcsv(json_db_fp: str, csv_filepath: str, homepage_fp: str) -> None:
 
 
 def main():
-    print(GLOBAL_)
     csv_file_path = GLOBAL_["file_locations"][1]["attendance_data"]
     homepage_file_path = GLOBAL_["file_locations"][1]["erp_homepage"]
     get_cred(GLOBAL_, GLOBAL_["file_locations"][1]["credentials"])
