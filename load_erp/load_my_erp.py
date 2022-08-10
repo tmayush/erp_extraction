@@ -1,10 +1,9 @@
 import requests, os, json
-from erp_utils import util_helper
-from erp_utils import attendance_extraction as attendance
-from erp_utils import json_csv_util as jcv
-from erp_utils import time_util
-
-GLOBAL = {}
+from erp_extraction.erp_utils import util_helper
+from erp_extraction.erp_utils import attendance_extraction as attendance
+from erp_extraction.erp_utils import json_csv_util as jcv
+from erp_extraction.erp_utils import time_util
+from erp_extraction.setup import GLOBAL_
 
 
 def get_cred(GLOBAL: dict, cred_filepath: str) -> None:
@@ -52,8 +51,8 @@ def set_headers(session_obj: requests.Session) -> None:
 
 
 def visit(session_obj: requests.Session, erp_url: str, homepage_filepath: str) -> None:
-    username = GLOBAL["username"]
-    password = GLOBAL["password"]
+    username = GLOBAL_["username"]
+    password = GLOBAL_["password"]
 
     # First Visit
     # This will be the first web request made to ERP inorder to get
@@ -91,34 +90,36 @@ def visit(session_obj: requests.Session, erp_url: str, homepage_filepath: str) -
     print("Successfully Generated Homepage")
 
 
-def createcsv(csv_filepath: str, homepage_fp: str) -> None:
+def createcsv(json_db_fp: str, csv_filepath: str, homepage_fp: str) -> None:
     print(f"Extracting data from {homepage_fp}")
     main_table = attendance.get_element_by_id(
         homepage_fp, "table", "ctl00_cpStud_grdSubject"
     )
     all_rows = attendance.get_summary_list(main_table)
-    json_file = "data.json"
-    jcv.create_db(json_file)
+    jcv.create_db(json_db_fp)
     my_dict = {
         "type": "Updated",
         "date": time_util.get_formatted_date(),
         "data": all_rows,
     }
-    jcv.update_db(my_dict, json_file, json_file)
-    jcv.generate_csv(json_file, csv_filepath)
+    jcv.update_db(my_dict, json_db_fp, json_db_fp)
+    jcv.generate_csv(json_db_fp, csv_filepath)
     print(f"Generated a CSV file - {csv_filepath}")
 
 
 def main():
-    csv_file_path = "attendance.csv"
-    homepage_file_path = "homepage.html"
-    get_cred(GLOBAL, "credentials.json")
+    print(GLOBAL_)
+    csv_file_path = GLOBAL_["file_locations"][1]["attendance_data"]
+    homepage_file_path = GLOBAL_["file_locations"][1]["erp_homepage"]
+    get_cred(GLOBAL_, GLOBAL_["file_locations"][1]["credentials"])
     url = "https://erp.cbit.org.in/beeserp/Login.aspx?ReturnUrl=%2fbeeserp%2f"
     with requests.Session() as cur_ses:
         set_headers(cur_ses)
         visit(cur_ses, url, homepage_file_path)
 
-    createcsv(csv_file_path, homepage_file_path)
+    createcsv(
+        GLOBAL_["file_locations"][1]["json_db"], csv_file_path, homepage_file_path
+    )
 
 
 if __name__ == "__main__":

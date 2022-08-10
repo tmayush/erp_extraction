@@ -1,5 +1,7 @@
 import os, json
 
+GLOBAL_ = {}
+
 
 def get_configs_data(config_fp) -> dict:
     """Could be app.config.json file or file_locations.json data
@@ -53,12 +55,13 @@ def create_fl_config(fp, root) -> None:
         "json_db": folder_loc_data["internal_F"] + "\\data.json",
         "attendance_data": folder_loc_data["attendance_data_F"]
         + "\\attendance data.csv",
+        "erp_homepage": folder_loc_data["internal_F"] + "\\homepage.html",
     }
     with open(fp, "w+") as file:
         json.dump([folder_loc_data, file_loc_data], file)
 
 
-def main(GLOBAL_, configs_F):
+def main(configs_F):
     cwd = GLOBAL_["root"]
     file_locations = f"{configs_F}\\file_locations.json"
     user_input = None
