@@ -6,7 +6,7 @@ from erp_extraction.erp_utils import time_util
 from erp_extraction.setup import GLOBAL_
 
 
-def get_cred(GLOBAL: dict, cred_filepath: str) -> None:
+def get_cred(cred_filepath: str) -> dict:
     """Retrieves the credentials from the credentials.json file from
     the current directory
 
@@ -16,8 +16,7 @@ def get_cred(GLOBAL: dict, cred_filepath: str) -> None:
     """
     with open(cred_filepath) as file:
         json_data = json.loads(file.read())
-        GLOBAL["username"] = json_data["username"]
-        GLOBAL["password"] = json_data["password"]
+    return json_data
 
 
 def set_headers(session_obj: requests.Session) -> None:
@@ -50,9 +49,11 @@ def set_headers(session_obj: requests.Session) -> None:
     session_obj.headers.update(injected_headers)
 
 
-def visit(session_obj: requests.Session, erp_url: str, homepage_filepath: str) -> None:
-    username = GLOBAL_["username"]
-    password = GLOBAL_["password"]
+def visit(
+    creds: dict, session_obj: requests.Session, erp_url: str, homepage_fp: str
+) -> None:
+    username = creds["username"]
+    password = creds["password"]
 
     # First Visit
     # This will be the first web request made to ERP inorder to get
@@ -84,7 +85,7 @@ def visit(session_obj: requests.Session, erp_url: str, homepage_filepath: str) -
     pwd_visit_res = session_obj.post(erp_url, data)
     print(f"{pwd_visit_res.status_code} - after giving password status code")
 
-    with open(homepage_filepath, "w+") as f:
+    with open(homepage_fp, "w+") as f:
         f.write(pwd_visit_res.content.decode("utf8"))
 
     print("Successfully Generated Homepage")
@@ -97,28 +98,28 @@ def createcsv(json_db_fp: str, csv_filepath: str, homepage_fp: str) -> None:
     )
     all_rows = attendance.get_summary_list(main_table)
     jcv.create_db(json_db_fp)
-    my_dict = {
+    updated_data = {
         "type": "Updated",
         "date": time_util.get_formatted_date(),
         "data": all_rows,
     }
-    jcv.update_db(my_dict, json_db_fp, json_db_fp)
+    jcv.update_db(updated_data, json_db_fp, json_db_fp)
     jcv.generate_csv(json_db_fp, csv_filepath)
     print(f"Generated a CSV file - {csv_filepath}")
 
 
 def main():
-    csv_file_path = GLOBAL_["file_locations"][1]["attendance_data"]
-    homepage_file_path = GLOBAL_["file_locations"][1]["erp_homepage"]
-    get_cred(GLOBAL_, GLOBAL_["file_locations"][1]["credentials"])
+    # file locations data (dict)
+    file_loc = GLOBAL_["paths"][1]
+    csv_fp = file_loc["attendance_data"]
+    homepage_fp = file_loc["erp_homepage"]
+    cred = get_cred(file_loc["credentials"])
     url = "https://erp.cbit.org.in/beeserp/Login.aspx?ReturnUrl=%2fbeeserp%2f"
     with requests.Session() as cur_ses:
         set_headers(cur_ses)
-        visit(cur_ses, url, homepage_file_path)
+        visit(cred, cur_ses, url, homepage_fp)
 
-    createcsv(
-        GLOBAL_["file_locations"][1]["json_db"], csv_file_path, homepage_file_path
-    )
+    createcsv(file_loc["json_db"], csv_fp, homepage_fp)
 
 
 if __name__ == "__main__":

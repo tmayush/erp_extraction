@@ -47,35 +47,35 @@ def setup_entities(fl_fp) -> None:
 def create_fl_config(fp, root) -> None:
     folder_loc_data = {
         "app_root": root,
-        "internal_F": f"{root}\\internal_data",
-        "attendance_data_F": f"{root}\\attendance data",
+        "internal_F": os.path.join(root, "internal_data"),
+        "attendance_data_F": os.path.join(root, "attendance data"),
     }
+    internal_F_fp = folder_loc_data["internal_F"]
+    attendance_F_fp = folder_loc_data["attendance_data_F"]
     file_loc_data = {
-        "credentials": folder_loc_data["internal_F"] + "\\credentials.json",
-        "json_db": folder_loc_data["internal_F"] + "\\data.json",
-        "attendance_data": folder_loc_data["attendance_data_F"]
-        + "\\attendance data.csv",
-        "erp_homepage": folder_loc_data["internal_F"] + "\\homepage.html",
+        "credentials": os.path.join(internal_F_fp, "credentials.json"),
+        "json_db": os.path.join(internal_F_fp, "data.json"),
+        "attendance_data": os.path.join(attendance_F_fp, "attendance data.csv"),
+        "erp_homepage": os.path.join(internal_F_fp, "homepage.html"),
     }
     with open(fp, "w+") as file:
         json.dump([folder_loc_data, file_loc_data], file)
 
 
-def main(configs_F):
+def main(paths_fp):
     cwd = GLOBAL_["root"]
-    file_locations = f"{configs_F}\\file_locations.json"
     user_input = None
-    file_locations_exists = os.path.exists(file_locations)
-    if file_locations_exists:
+    paths_fp_exists = os.path.exists(paths_fp)
+    if paths_fp_exists:
         user_input = input(
             "File locations config already exists. Do you want to use those "
             "configs or overwrite with the default configs (y/n)\n"
         )
-    if user_input == "y" or not file_locations_exists:
-        create_fl_config(file_locations, cwd)
+    if user_input == "y" or not paths_fp_exists:
+        create_fl_config(paths_fp, cwd)
 
     # Create file locations
-    setup_entities(file_locations)
+    setup_entities(paths_fp)
 
 
 if __name__ == "__main__":
