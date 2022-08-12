@@ -1,29 +1,5 @@
-import json, csv, os
-
-
-def create_db(fp) -> None:
-    if os.path.exists(fp):
-        return
-    with open(fp, "w+") as file:
-        file.write("[]")
-
-
-def update_db(new_dict: dict, old_fp: str, target_fp: str) -> None:
-    final_data_arr = []
-
-    with open(old_fp, "r+") as file:
-        final_data_arr = json.load(file)
-
-    if len(final_data_arr) >= 1:
-        prev_data_dict = final_data_arr[0]
-        prev_data_dict["type"] = "Previous"
-        if len(final_data_arr) > 1:
-            final_data_arr.pop()
-
-    final_data_arr.insert(0, new_dict)
-
-    with open(target_fp, "w+") as file:
-        json.dump(final_data_arr, file)
+import json, csv
+from erp_extraction.erp_utils import erp_db
 
 
 def fix_row(row: list, col_size, skew="left") -> list:
@@ -44,7 +20,7 @@ def fix_row(row: list, col_size, skew="left") -> list:
         return extra_data
 
 
-def generate_csv(data_fp, target_fp):
+def generate_csv(data_fp, target_fp) -> None:
     data = None
     with open(data_fp, "r+") as file:
         data = json.load(file)
@@ -58,9 +34,11 @@ def generate_csv(data_fp, target_fp):
             writer.writerows(rows)
             writer.writerow(["-"] * col_size)
 
+    print(f"Generated a CSV file - {target_fp}")
+
 
 def main():
-    update_db(
+    erp_db.update_db(
         {"type": "updated", "date": "hello", "data": ["some"]},
         "data.json",
         "data1.json",

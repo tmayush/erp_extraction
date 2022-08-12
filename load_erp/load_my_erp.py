@@ -1,8 +1,7 @@
 import requests, os, json
 from erp_extraction.erp_utils import util_helper
-from erp_extraction.erp_utils import attendance_extraction as attendance
-from erp_extraction.erp_utils import json_csv_util as jcv
-from erp_extraction.erp_utils import time_util
+from erp_extraction.erp_utils import erp_csv
+from erp_extraction.erp_utils import erp_db
 from erp_extraction.setup import GLOBAL_
 
 
@@ -91,35 +90,18 @@ def visit(
     print("Successfully Generated Homepage")
 
 
-def createcsv(json_db_fp: str, csv_filepath: str, homepage_fp: str) -> None:
-    print(f"Extracting data from {homepage_fp}")
-    main_table = attendance.get_element_by_id(
-        homepage_fp, "table", "ctl00_cpStud_grdSubject"
-    )
-    all_rows = attendance.get_summary_list(main_table)
-    jcv.create_db(json_db_fp)
-    updated_data = {
-        "type": "Updated",
-        "date": time_util.get_formatted_date(),
-        "data": all_rows,
-    }
-    jcv.update_db(updated_data, json_db_fp, json_db_fp)
-    jcv.generate_csv(json_db_fp, csv_filepath)
-    print(f"Generated a CSV file - {csv_filepath}")
-
-
 def main():
     # file locations data (dict)
     file_loc = GLOBAL_["paths"][1]
     csv_fp = file_loc["attendance_data"]
     homepage_fp = file_loc["erp_homepage"]
-    cred = get_cred(file_loc["credentials"])
+    creds = get_cred(file_loc["credentials"])
     url = "https://erp.cbit.org.in/beeserp/Login.aspx?ReturnUrl=%2fbeeserp%2f"
     with requests.Session() as cur_ses:
         set_headers(cur_ses)
-        visit(cred, cur_ses, url, homepage_fp)
-
-    createcsv(file_loc["json_db"], csv_fp, homepage_fp)
+        visit(creds, cur_ses, url, homepage_fp)
+    erp_db.create_db(file_loc["json_db"], homepage_fp)
+    erp_csv.generate_csv(file_loc["json_db"], csv_fp)
 
 
 if __name__ == "__main__":
