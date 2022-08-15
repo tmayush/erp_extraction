@@ -1,14 +1,13 @@
 import urllib.parse as url_parse
 
 
-my_list = []
-
-
-def trial(file_name):
+def filter_input_tag(file_name, input_type):
+    input_lines = []
     with open(file_name, "r") as file:
         for line in file:
-            if '<input type="hidden"' in line:
-                my_list.append(line)
+            if f'<input type="{input_type}"' in line:
+                input_lines.append(line)
+    return input_lines
 
 
 def get_pairs(line, attr):
@@ -26,13 +25,18 @@ def get_pairs(line, attr):
     return url_parse.quote(content, safe="")
 
 
-def get_data(file_name):
-    trial(file_name)
-    fin_dict = {}
-    for line in my_list:
-        fin_dict[get_pairs(line, "name")] = get_pairs(line, "value")
+def get_formatted_formdata(file_name, input_type):
+    formdata_dict = get_formdata(file_name, input_type)
     data = ""
-    for (key, value) in fin_dict.items():
+    for (key, value) in formdata_dict.items():
         data += f"{key}={value}&"
     data = data[:-1]
     return data
+
+
+def get_formdata(file_name, input_type) -> dict:
+    input_lines = filter_input_tag(file_name, input_type)
+    fin_dict = {}
+    for line in input_lines:
+        fin_dict[get_pairs(line, "name")] = get_pairs(line, "value")
+    return fin_dict
