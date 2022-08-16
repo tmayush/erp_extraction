@@ -3,6 +3,7 @@ from erp_extraction.erp_utils import util_helper
 from erp_extraction.erp_utils import erp_csv
 from erp_extraction.erp_utils import erp_db
 from erp_extraction.setup import GLOBAL_
+from erp_extraction.grades import get_grades
 
 
 def get_cred(cred_filepath: str) -> dict:
@@ -66,22 +67,22 @@ def visit(
         file.write(first_visit_res.text)
 
     # this will give us the new post data to be sent to the server
-    data = util_helper.get_data("temp.html")
+    formdata = util_helper.get_formatted_formdata("temp.html", "hidden")
 
     # Gives Username
-    data += f"&txtUserName={username}"
-    uname_visit_res = session_obj.post(erp_url, data)
+    formdata += f"&txtUserName={username}"
+    uname_visit_res = session_obj.post(erp_url, formdata)
     print(f"{uname_visit_res.status_code} - after giving username status code")
 
     with open("temp.html", "w+") as f:
         f.write(uname_visit_res.text)
 
-    data = util_helper.get_data("temp.html")
+    formdata = util_helper.get_formatted_formdata("temp.html", "hidden")
     os.remove("temp.html")
 
     # Gives Password
-    data += f"&txtPassword={password}"
-    pwd_visit_res = session_obj.post(erp_url, data)
+    formdata += f"&txtPassword={password}&btnSubmit=Submit"
+    pwd_visit_res = session_obj.post(erp_url, formdata)
     print(f"{pwd_visit_res.status_code} - after giving password status code")
 
     with open(homepage_fp, "w+") as f:
@@ -102,6 +103,7 @@ def main():
         visit(creds, cur_ses, url, homepage_fp)
     erp_db.create_db(file_loc["json_db"], homepage_fp)
     erp_csv.generate_csv(file_loc["json_db"], csv_fp)
+    # get_grades.main(cur_ses, url)
 
 
 if __name__ == "__main__":
