@@ -1,12 +1,11 @@
-__pycache__
-*.html
-*.csv
 *credentials*.json
-*data*.json
-.prettierignore
-attendance data
 internal_data
-file_locations.json
+user data
 paths.json
 *-ignore*
-user data
+
+# Python compiled files
+__pycache__
+
+# Prettier extension ignore rules
+.prettierignore
