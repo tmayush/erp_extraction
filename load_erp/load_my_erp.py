@@ -3,7 +3,7 @@ from erp_extraction.erp_utils import util_helper
 from erp_extraction.erp_utils import erp_csv
 from erp_extraction.erp_utils import erp_db
 from erp_extraction.setup import GLOBAL_
-from erp_extraction.grades import get_grades
+from erp_extraction.grades import grades_extraction
 
 
 def get_cred(cred_filepath: str) -> dict:
@@ -54,6 +54,7 @@ def visit(
 ) -> None:
     username = creds["username"]
     password = creds["password"]
+    temp_fp = GLOBAL_["paths"][1]["temp"]
 
     # First Visit
     # This will be the first web request made to ERP inorder to get
@@ -63,22 +64,22 @@ def visit(
 
     # Writes the first visit html data to a temporary file from
     # which the majority of the post data is extracted
-    with open("temp.html", "w+") as file:
+    with open(temp_fp, "w+") as file:
         file.write(first_visit_res.text)
 
     # this will give us the new post data to be sent to the server
-    formdata = util_helper.get_formatted_formdata("temp.html", "hidden")
+    formdata = util_helper.get_formatted_formdata(temp_fp, "hidden")
 
     # Gives Username
     formdata += f"&txtUserName={username}"
     uname_visit_res = session_obj.post(erp_url, formdata)
     print(f"{uname_visit_res.status_code} - after giving username status code")
 
-    with open("temp.html", "w+") as f:
+    with open(temp_fp, "w+") as f:
         f.write(uname_visit_res.text)
 
-    formdata = util_helper.get_formatted_formdata("temp.html", "hidden")
-    os.remove("temp.html")
+    formdata = util_helper.get_formatted_formdata(temp_fp, "hidden")
+    os.remove(temp_fp)
 
     # Gives Password
     formdata += f"&txtPassword={password}&btnSubmit=Submit"
@@ -101,9 +102,13 @@ def main():
     with requests.Session() as cur_ses:
         set_headers(cur_ses)
         visit(creds, cur_ses, url, homepage_fp)
+
+    # Generate Attendance CSV file
     erp_db.create_db(file_loc["json_db"], homepage_fp)
     erp_csv.generate_csv(file_loc["json_db"], csv_fp)
-    # get_grades.main(cur_ses, url)
+
+    # Generate Grades CSV file
+    grades_extraction.get_grades(cur_ses, url, 2)
 
 
 if __name__ == "__main__":

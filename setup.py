@@ -48,15 +48,19 @@ def create_fl_config(fp, root) -> None:
     folder_loc_data = {
         "app_root": root,
         "internal_F": os.path.join(root, "internal_data"),
-        "attendance_data_F": os.path.join(root, "attendance data"),
+        "user_data_F": os.path.join(root, "user data"),
     }
     internal_F_fp = folder_loc_data["internal_F"]
-    attendance_F_fp = folder_loc_data["attendance_data_F"]
+    user_data_F_fp = folder_loc_data["user_data_F"]
     file_loc_data = {
         "credentials": os.path.join(internal_F_fp, "credentials.json"),
         "json_db": os.path.join(internal_F_fp, "data.json"),
-        "attendance_data": os.path.join(attendance_F_fp, "attendance data.csv"),
+        "marks_db": os.path.join(internal_F_fp, "marks_db.json"),
         "erp_homepage": os.path.join(internal_F_fp, "homepage.html"),
+        "erp_semwise_marks": os.path.join(internal_F_fp, "erp_semwise_marks.html"),
+        "attendance_data": os.path.join(user_data_F_fp, "attendance data.csv"),
+        "marks_data": os.path.join(user_data_F_fp, "marks data.csv"),
+        "temp": os.path.join(internal_F_fp, "temp.html"),
     }
     with open(fp, "w+") as file:
         json.dump([folder_loc_data, file_loc_data], file)

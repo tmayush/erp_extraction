@@ -8,3 +8,5 @@ attendance data
 internal_data
 file_locations.json
 paths.json
+*-ignore*
+user data
