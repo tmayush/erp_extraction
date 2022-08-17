@@ -44,8 +44,9 @@ def create_filled_semwise_marks_page(
         file.write(res.text)
 
 
-def main(cur_ses: requests.Session, url: str, sem_num: int):
+def get_grades(cur_ses: requests.Session, url: str, sem_num: int):
     file_locations = GLOBAL_["paths"][1]
+
     # File locations related to the generation of Semwise marks page
     marks_page_fl = {
         "homepage_fp": file_locations["erp_homepage"],
@@ -63,4 +64,4 @@ def main(cur_ses: requests.Session, url: str, sem_num: int):
 
 
 if __name__ == "__main__":
-    main()
+    get_grades()
