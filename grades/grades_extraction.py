@@ -5,6 +5,18 @@ from erp_extraction.erp_utils import util_helper
 from erp_extraction.grades import grades_json, grades_csv
 
 
+def get_semesters_from_html(temp_page_fp) -> dict:
+    available_sems_raw = util_helper.extract_formdata(temp_page_fp, "submit")
+    # available_sems = {}
+    # for sem_id, sem_name in available_sems_raw.items():
+    #     available_sems[urllib.parse.unquote(sem_id)] = urllib.parse.unquote(sem_name)
+    # return available_sems
+    return {
+        urllib.parse.unquote_plus(sem_id): urllib.parse.unquote_plus(sem_name)
+        for sem_id, sem_name in available_sems_raw.items()
+    }
+
+
 def create_temp_semwise_marks_page(
     cur_ses: requests.Session, url: str, file_locations: dict
 ):
@@ -16,52 +28,46 @@ def create_temp_semwise_marks_page(
     formdata["__EVENTTARGET"] = "ctl00%24cpHeader%24ucStud%24lnkOverallMarksSemwise"
     # formdata.pop("__LASTFOCUS")
     resp = cur_ses.post(url, json=formdata)
-    print(f"{resp.status_code} - Generated the OverallMarksSemwise page")
+    print(f"{resp.status_code} - Generated the marks page")
     with open(temp_page_fp, "w+") as file:
         file.write(resp.text)
 
 
 def create_filled_semwise_marks_page(
-    sem_num: int, cur_ses: requests.Session, url: str, file_locations: dict
+    sem_data: dict, cur_ses: requests.Session, url: str, file_locations: dict
 ):
     temp_page_fp = file_locations["temp_page_fp"]
     marks_page_fp = file_locations["marks_page_fp"]
 
     formdata_dict = util_helper.extract_formdata(temp_page_fp, "hidden")
-    available_sems = util_helper.extract_formdata(temp_page_fp, "submit")
-
-    for sem_id, sem_name in available_sems.items():
-        if int(sem_id[-1]) == sem_num:
-            formdata_dict[sem_id] = urllib.parse.quote_plus(sem_name)
-            break
     # del cur_ses.headers["Pragma"]
     # del cur_ses.headers["Cache-Control"]
-
+    formdata_dict.update(sem_data)
     formdata = util_helper.format_formdata(formdata_dict)
     res = cur_ses.post(url, data=formdata)
-    print(f"{res.status_code} - Generated the OverallMarksSemwise page with results")
+    print(f"{res.status_code} - Generated the marks page with grades")
     with open(marks_page_fp, "w+") as file:
         file.write(res.text)
 
 
-def get_grades(cur_ses: requests.Session, url: str, sem_num: int):
-    file_locations = GLOBAL_["paths"][1]
-
-    # File locations related to the generation of Semwise marks page
-    marks_page_fl = {
-        "homepage_fp": file_locations["erp_homepage"],
-        "temp_page_fp": file_locations["temp"],
-        "marks_page_fp": file_locations["erp_semwise_marks"],
-    }
+def get_semesters(cur_ses: requests.Session, marks_page_fl: dict) -> dict:
     url = (
         "https://erp.cbit.org.in/beeserp/StudentLogin/Student/OverallMarksSemwise.aspx"
     )
     create_temp_semwise_marks_page(cur_ses, url, marks_page_fl)
-    create_filled_semwise_marks_page(sem_num, cur_ses, url, marks_page_fl)
+    return get_semesters_from_html(marks_page_fl["temp_page_fp"])
+
+
+def get_grades(sem_data, sem_num: int, cur_ses: requests.Session, marks_page_fl: dict):
+    url = (
+        "https://erp.cbit.org.in/beeserp/StudentLogin/Student/OverallMarksSemwise.aspx"
+    )
+    user_sem_data = {
+        urllib.parse.quote_plus(k): urllib.parse.quote_plus(v)
+        for k, v in sem_data.items()
+        if int(k[-1]) == sem_num
+    }
+    create_filled_semwise_marks_page(user_sem_data, cur_ses, url, marks_page_fl)
     os.remove(marks_page_fl["temp_page_fp"])
     grades_json.create_marks_db(sem_num)
     grades_csv.create_csv(sem_num)
-
-
-if __name__ == "__main__":
-    get_grades()
