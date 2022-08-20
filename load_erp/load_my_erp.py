@@ -92,23 +92,17 @@ def visit(
     print("Successfully Generated Homepage")
 
 
-def main():
+def main() -> requests.Session:
     # file locations data (dict)
     file_loc = GLOBAL_["paths"][1]
-    csv_fp = file_loc["attendance_data"]
     homepage_fp = file_loc["erp_homepage"]
     creds = get_cred(file_loc["credentials"])
     url = "https://erp.cbit.org.in/beeserp/Login.aspx?ReturnUrl=%2fbeeserp%2f"
-    with requests.Session() as cur_ses:
-        set_headers(cur_ses)
-        visit(creds, cur_ses, url, homepage_fp)
-
-    # Generate Attendance CSV file
-    erp_db.create_db(file_loc["json_db"], homepage_fp)
-    erp_csv.generate_csv(file_loc["json_db"], csv_fp)
-
-    # Generate Grades CSV file
-    grades_extraction.get_grades(cur_ses, url, 2)
+    cur_ses = requests.Session()
+    set_headers(cur_ses)
+    visit(creds, cur_ses, url, homepage_fp)
+    GLOBAL_["cur_ses"] = cur_ses
+    return cur_ses
 
 
 if __name__ == "__main__":
