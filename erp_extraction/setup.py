@@ -3,6 +3,17 @@ import os, json
 GLOBAL_ = {}
 
 
+def ask_credentials(creds_fp):
+    print(
+        f"Your credentials are stored locally at {creds_fp} and "
+        "are not sent to any external server other than erp.cbit.org.in"
+    )
+    print("Please enter your credentials: ")
+    creds = {"username": input("username: "), "password": input("password: ")}
+    with open(creds_fp, "w+") as file:
+        json.dump(creds, file)
+
+
 def get_configs_data(config_fp) -> dict:
     """Could be app.config.json file or file_locations.json data
 

@@ -19,6 +19,7 @@ def main():
         GLOBAL_["config_data"]["first_run"] = False
         setup.update_configs_data(GLOBAL_["config_data"], config_fp)
         setup.main(paths_fp)
+        setup.ask_credentials(setup.get_configs_data(paths_fp)[1]["credentials"])
     GLOBAL_["paths"] = setup.get_configs_data(paths_fp)
     menu0 = menu_display.Menu()
     menu0.display_menu()
