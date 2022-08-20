@@ -1,6 +1,6 @@
 import os
 from erp_extraction import setup
-from erp_extraction.load_erp import load_my_erp
+from erp_extraction.menu import menu_display
 
 
 def main():
@@ -20,7 +20,8 @@ def main():
         setup.update_configs_data(GLOBAL_["config_data"], config_fp)
         setup.main(paths_fp)
     GLOBAL_["paths"] = setup.get_configs_data(paths_fp)
-    load_my_erp.main()
+    menu0 = menu_display.Menu()
+    menu0.display_menu()
 
 
 main()
