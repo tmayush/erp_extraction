@@ -1,0 +1,14 @@
+[
+  {
+    "id": "start",
+    "description": "Main menu after launching the app"
+  },
+  {
+    "id": "end",
+    "description": "Quits Menu"
+  },
+  {
+    "id": "choose_semester",
+    "description": "Choose semester to generate report"
+  }
+]
