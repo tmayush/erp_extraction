@@ -60,7 +60,7 @@ def visit(
     # This will be the first web request made to ERP inorder to get
     # the session ID and store it as a cookie
     first_visit_res = session_obj.get(erp_url)
-    print(f"{first_visit_res.status_code} - first visit status code")
+    print(f"{first_visit_res.status_code} status code - first visit")
 
     # Writes the first visit html data to a temporary file from
     # which the majority of the post data is extracted
@@ -73,7 +73,7 @@ def visit(
     # Gives Username
     formdata += f"&txtUserName={username}"
     uname_visit_res = session_obj.post(erp_url, formdata)
-    print(f"{uname_visit_res.status_code} - after giving username status code")
+    print(f"{uname_visit_res.status_code} status code - Injected username")
 
     with open(temp_fp, "w+") as f:
         f.write(uname_visit_res.text)
@@ -84,7 +84,7 @@ def visit(
     # Gives Password
     formdata += f"&txtPassword={password}&btnSubmit=Submit"
     pwd_visit_res = session_obj.post(erp_url, formdata)
-    print(f"{pwd_visit_res.status_code} - after giving password status code")
+    print(f"{pwd_visit_res.status_code} status code - Injected Password")
 
     with open(homepage_fp, "w+") as f:
         f.write(pwd_visit_res.content.decode("utf8"))

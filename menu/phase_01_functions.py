@@ -34,7 +34,7 @@ def grades(menu0):
     sem_data = grades_extraction.get_semesters(cur_ses, marks_page_fl)
     menu0.__p0grades_sem_data = sem_data
 
-    print("Choose the semester to fetch grades from")
+    print("Choose the semester to fetch grades from: ")
     p1_options = {semester: p2.get_grades_from_sem for semester in sem_data.values()}
     menu0.add_phase("choose_semester", p1_options)
     menu0.set_current_menu_id("choose_semester")

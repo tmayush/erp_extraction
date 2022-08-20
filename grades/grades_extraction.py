@@ -28,7 +28,7 @@ def create_temp_semwise_marks_page(
     formdata["__EVENTTARGET"] = "ctl00%24cpHeader%24ucStud%24lnkOverallMarksSemwise"
     # formdata.pop("__LASTFOCUS")
     resp = cur_ses.post(url, json=formdata)
-    print(f"{resp.status_code} - Generated the marks page")
+    print(f"{resp.status_code} status code - Can access the marks page")
     with open(temp_page_fp, "w+") as file:
         file.write(resp.text)
 
@@ -45,7 +45,7 @@ def create_filled_semwise_marks_page(
     formdata_dict.update(sem_data)
     formdata = util_helper.format_formdata(formdata_dict)
     res = cur_ses.post(url, data=formdata)
-    print(f"{res.status_code} - Generated the marks page with grades")
+    print(f"{res.status_code} status code - Generated the marks page with grades")
     with open(marks_page_fp, "w+") as file:
         file.write(res.text)
 
