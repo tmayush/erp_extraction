@@ -1,6 +1,7 @@
 import os, json
 from erp_extraction.erp_utils import attendance_extraction
 from erp_extraction.erp_utils import erp_time
+from erp_extraction.erp_utils.json_utils import create_JSON_data_file
 
 
 def create_db(json_db_fp: str, homepage_fp: str) -> None:
@@ -9,7 +10,6 @@ def create_db(json_db_fp: str, homepage_fp: str) -> None:
         homepage_fp, "table", "ctl00_cpStud_grdSubject"
     )
     all_rows = attendance_extraction.get_summary_list(main_table)
-    create_db_file(json_db_fp)
     updated_data = {
         "type": "Updated",
         "date": erp_time.get_formatted_date(),
@@ -18,18 +18,10 @@ def create_db(json_db_fp: str, homepage_fp: str) -> None:
     update_db(updated_data, json_db_fp, json_db_fp)
 
 
-def create_db_file(fp) -> None:
-    if os.path.exists(fp):
-        return
-    with open(fp, "w+") as file:
-        file.write("[]")
-
-
 def update_db(new_dict: dict, old_fp: str, target_fp: str) -> None:
     final_data_arr = []
 
-    with open(old_fp, "r+") as file:
-        final_data_arr = json.load(file)
+    final_data_arr = create_JSON_data_file(old_fp)
 
     if len(final_data_arr) >= 1:
         prev_data_dict = final_data_arr[0]

@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Tuple, Union
 
 
 def is_JSON_serializable(fp):
@@ -13,7 +14,7 @@ def is_JSON_serializable(fp):
     return is_serializable
 
 
-def create_JSON_data_file(fp, default_content=[]):
+def create_JSON_data_file(fp, default_content=[], force=False) -> Union[list, dict]:
     """Retrieves data from the json file if it exists, or
     it creates a new file with default content
 
@@ -27,7 +28,7 @@ def create_JSON_data_file(fp, default_content=[]):
     Returns:
         list|dict|JSON serialized data: data from the filepath provided
     """
-    if os.path.exists(fp):
+    if os.path.exists(fp) or force:
         if not is_JSON_serializable(fp):
             user_input = input(
                 "Do you want to overwrite the content of this file with new content? (y/n): "
