@@ -51,17 +51,13 @@ def create_filled_semwise_marks_page(
 
 
 def get_semesters(cur_ses: requests.Session, marks_page_fl: dict) -> dict:
-    url = (
-        "https://erp.cbit.org.in/beeserp/StudentLogin/Student/OverallMarksSemwise.aspx"
-    )
+    url = "https://erp.cbit.org.in/StudentLogin/Student/OverallMarksSemwise.aspx"
     create_temp_semwise_marks_page(cur_ses, url, marks_page_fl)
     return get_semesters_from_html(marks_page_fl["temp_page_fp"])
 
 
 def get_grades(sem_data, sem_num: int, cur_ses: requests.Session, marks_page_fl: dict):
-    url = (
-        "https://erp.cbit.org.in/beeserp/StudentLogin/Student/OverallMarksSemwise.aspx"
-    )
+    url = "https://erp.cbit.org.in/StudentLogin/Student/OverallMarksSemwise.aspx"
     user_sem_data = {
         urllib.parse.quote_plus(k): urllib.parse.quote_plus(v)
         for k, v in sem_data.items()

@@ -97,7 +97,7 @@ def main() -> requests.Session:
     file_loc = GLOBAL_["paths"][1]
     homepage_fp = file_loc["erp_homepage"]
     creds = get_cred(file_loc["credentials"])
-    url = "https://erp.cbit.org.in/beeserp/Login.aspx?ReturnUrl=%2fbeeserp%2f"
+    url = "https://erp.cbit.org.in/Login.aspx?ReturnUrl=%2f"
     cur_ses = requests.Session()
     set_headers(cur_ses)
     visit(creds, cur_ses, url, homepage_fp)
